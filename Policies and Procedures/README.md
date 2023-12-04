@@ -1,3 +1,3 @@
-Customized real-world examples of written policies and procedures.
+# Customized real-world examples of written policies and procedures.
 
 The file named "Potential Security Event Handling Guide.pdf" was created speicifcally for an organization that didn't want to make security difficult but wanted to improve upon existing methods. I identified a need for standardization of escalations between the engineering, service desk, and newly created security team. I tailored the guide to the organization's leadership and staff while still utilizing necessary principles from NIST SP 800-61. https://github.com/ticfinack/Showcase/blob/main/Policies%20and%20Procedures/Potential%20Security%20Event%20Handling%20Guide.pdf
