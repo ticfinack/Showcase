@@ -98,7 +98,7 @@ ports = [20,21,22,25,80,53,110,143,443,445,465,587,993,1433,3389,8080,8443,5060,
 
 # create a function for syn scan
 def SynScan(host):
-    print("Checking for listening ports at %s.........................." % host, end='\r')
+    print("Checking for listening ports at %s.........................." % host)
     ans,unans = sr(IP(dst=host)/TCP(dport=ports,flags="S"),inter=0.5,timeout=10,verbose=1)
     logging.info("Open TCP ports at %s:" % host)
     for (s,r,) in ans:
@@ -109,7 +109,7 @@ def SynScan(host):
 
 # create a function for dns scan
 def DNSScan(host, domain):
-    print("Checking for existence of DNS server at %s.........................." % host, end='\r')
+    print("Checking for existence of DNS server at %s.........................." % host)
     ans,unans = sr(IP(dst=host)/TCP(dport=53)/DNS(rd=1,qd=DNSQR(qname=domain)),retry=2,timeout=4,verbose=0)
     if ans:
         logging.info("DNS Server at %s"%host)
