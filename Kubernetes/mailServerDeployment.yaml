@@ -1,0 +1,752 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-data
+  namespace: custom-mail
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: microk8s-hostpath
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: opendkim-conf
+  namespace: custom-mail
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: microk8s-hostpath
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: roundcube-config
+  namespace: custom-mail
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: microk8s-hostpath
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: roundcube-html
+  namespace: custom-mail
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: microk8s-hostpath
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: roundcube-temp
+  namespace: custom-mail
+spec:
+  resources:
+    requests:
+      storage: 50Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: slst-disk
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dovecot-conf
+  namespace: custom-mail
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: microk8s-hostpath
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postfix-conf
+  namespace: custom-mail
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: microk8s-hostpath
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dovecot-mail
+  namespace: custom-mail
+spec:
+  resources:
+    requests:
+      storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: slst-disk
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-data
+  namespace: custom-mail
+spec:
+  resources:
+    requests:
+      storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: slst-disk
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-html
+  namespace: custom-mail
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: microk8s-hostpath
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+  namespace: custom-mail
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: microk8s-hostpath
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-config
+  namespace: custom-mail
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: microk8s-hostpath
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+  namespace: custom-mail
+data:
+  MARIADB_ROOT_PASSWORD: ****Base64EncodedString****
+  MARIADB_PASSWORD: ****Base64EncodedString****
+  roundcube_des_key: ****Base64EncodedString****
+  NEXTCLOUD_ADMIN_PASSWORD: ****Base64EncodedString****
+  DRIVE_SMTP_PASSWORD: ****Base64EncodedString****
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: custom-mail
+  name: dovecot
+spec:
+  type: LoadBalancer
+  selector:
+    app: dovecot
+  ports:
+    - protocol: TCP
+      port: 143
+      targetPort: 143
+      name: imap
+    - protocol: TCP
+      port: 587
+      targetPort: 587
+      name: submission
+    - protocol: TCP
+      port: 4190
+      targetPort: 4190
+      name: sieve
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: custom-mail
+  name: dovecot-sasl
+spec:
+  selector:
+    app: dovecot
+  ports:
+    - protocol: TCP
+      port: 44214
+      targetPort: 44214
+      name: auth
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: custom-mail
+  name: redis
+spec:
+  selector:
+    app: redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+      name: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: custom-mail
+  name: opendkim
+spec:
+  selector:
+    app: opendkim
+  ports:
+    - protocol: TCP
+      port: 8891
+      targetPort: 8891
+      name: opendkim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: custom-mail
+  name: dovecot-lmtp
+spec:
+  selector:
+    app: dovecot
+  ports:
+    - protocol: TCP
+      port: 55212
+      targetPort: 55212
+      name: auth
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: custom-mail
+  name: roundcube
+spec:
+  selector:
+    app: roundcube
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: custom-mail
+  name: nextcloud
+spec:
+  selector:
+    app: nextcloud
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: custom-mail
+  name: mysql
+spec:
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+      name: mysql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: custom-mail
+  name: postfix
+spec:
+  type: LoadBalancer
+  selector:
+    app: postfix
+  ports:
+    - protocol: TCP
+      port: 25
+      targetPort: 25
+      name: smtp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: custom-mail
+  name: dovecot-submission
+spec:
+  selector:
+    app: postfix
+  ports:
+    - protocol: TCP
+      port: 2525
+      targetPort: 2525
+      name: dovecot-submission
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: custom-mail
+  name: roundcube
+  annotations:
+    cert-manager.io/cluster-issuer: lets-encrypt-production
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  tls:
+    - hosts:
+        - mail.custom.com
+      secretName: mail-custom-com-tls
+  rules:
+    - host: mail.custom.com
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: roundcube
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: custom-mail
+  name: nextcloud
+  annotations:
+    cert-manager.io/cluster-issuer: lets-encrypt-production
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  tls:
+    - hosts:
+        - drive.custom.com
+      secretName: drive-custom-com-tls
+  rules:
+    - host: drive.custom.com
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: nextcloud
+                port:
+                  number: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: custom-mail
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      hostname: mysql
+      containers:
+      - name: mysql
+        image: mariadb:11
+        ports:
+        - containerPort: 3306
+          name: mysql
+        env:
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: MARIADB_ROOT_PASSWORD
+        - name: MARIADB_DATABASE
+          value: roundcube
+        - name: MARIADB_USER
+          value: "customdbadmin"
+        - name: MARIADB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: MARIADB_PASSWORD
+        volumeMounts:
+        - mountPath: "/var/lib/mysql"
+          name: mysql-data
+      volumes:
+      - name: mysql-data
+        persistentVolumeClaim:
+          claimName: mysql-data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: roundcube
+  namespace: custom-mail
+  labels:
+    app: roundcube
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: roundcube
+  template:
+    metadata:
+      labels:
+        app: roundcube
+    spec:
+      hostname: roundcube
+      containers:
+      - name: roundcube
+        image: roundcube/roundcubemail:1.5.3-apache
+        ports:
+        - containerPort: 80
+          name: http
+        env:
+        - name: ROUNDCUBEMAIL_DB_TYPE
+          value: "mysql"
+        - name: ROUNDCUBEMAIL_DB_HOST
+          value: "mysql.custom-mail.svc.cluster.local"
+        - name: ROUNDCUBEMAIL_DB_PORT
+          value: "3306"
+        - name: ROUNDCUBEMAIL_DB_USER
+          value: "customdbadmin"
+        - name: ROUNDCUBEMAIL_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: MARIADB_PASSWORD
+        - name: ROUNDCUBEMAIL_DB_NAME
+          value: roundcube
+        - name: roundcube_des_key
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: roundcube_des_key
+        - name: ROUNDCUBEMAIL_SMTP_SERVER
+          value: "postfix.custom-mail.svc.cluster.local"
+        - name: ROUNDCUBEMAIL_SMTP_PORT
+          value: "587"
+        - name: ROUNDCUBEMAIL_DEFAULT_HOST
+          value: "dovecot.custom-mail.svc.cluster.local"
+        - name: ROUNDCUBEMAIL_DEFAULT_PORT
+          value: "143"
+        - name: ROUNDCUBEMAIL_UPLOAD_MAX_FILESIZE
+          value: "10G"
+        volumeMounts:
+        - mountPath: "/var/www/html"
+          name: roundcube-html
+        - mountPath: "/var/roundcube/config"
+          name: roundcube-config
+        - mountPath: "/tmp/roundcube-temp"
+          name: roundcube-temp
+        - mountPath: "/etc/secrets"
+          name: app-secrets
+      volumes:
+      - name: roundcube-html
+        persistentVolumeClaim:
+          claimName: roundcube-html
+      - name: roundcube-config
+        persistentVolumeClaim:
+          claimName: roundcube-config
+      - name: roundcube-temp
+        persistentVolumeClaim:
+          claimName: roundcube-temp
+      - name: app-secrets
+        secret:
+          secretName: app-secrets
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dovecot
+  namespace: custom-mail
+  labels:
+    app: dovecot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dovecot
+  template:
+    metadata:
+      labels:
+        app: dovecot
+    spec:
+      hostname: dovecot
+      containers:
+      - name: dovecot
+        image: dovecot/dovecot:2.3.20
+        ports:
+        - containerPort: 143
+          name: imap
+        - containerPort: 4190
+          name: sieve
+        - containerPort: 587
+          name: submission
+        - containerPort: 44214
+          name: auth
+        volumeMounts:
+        - mountPath: "/etc/dovecot"
+          name: dovecot-conf
+        - mountPath: "/var/mail"
+          name: dovecot-mail
+        - mountPath: "/etc/ssl/dovecot"
+          name: mail-custom-com-tls
+      volumes:
+      - name: dovecot-conf
+        persistentVolumeClaim:
+          claimName: dovecot-conf
+      - name: dovecot-mail
+        persistentVolumeClaim:
+          claimName: dovecot-mail
+      - name: mail-custom-com-tls
+        secret:
+          secretName: mail-custom-com-tls
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postfix
+  namespace: custom-mail
+  labels:
+    app: postfix
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postfix
+  template:
+    metadata:
+      labels:
+        app: postfix
+    spec:
+      hostname: postfix
+      imagePullSecrets:
+      - name: images-custom-com-registry
+      containers:
+        - name: postfix
+          image: images.custom.com/ticfinack/postfix:v1.0
+          imagePullPolicy: Always
+          env:
+            - name: MAILDOMAIN
+              value: "custom.com"
+            - name: MYHOSTNAME
+              value: "mail.custom.com"
+            - name: CLUSTERDOMAIN
+              value: "cluster.local"
+            - name: LMTPSERVICENAME
+              value: "dovecot-lmtp"
+            - name: SASLSERVICENAME
+              value: "dovecot-sasl"
+          ports:
+            - containerPort: 25
+              name: smtp
+            - containerPort: 587
+              name: submission
+          volumeMounts:
+            - mountPath: "/etc/postfix"
+              name: postfix-conf
+            - mountPath: "/etc/ssl/postfix"
+              name: mail-custom-com-tls
+      volumes:
+        - name: postfix-conf
+          persistentVolumeClaim:
+            claimName: postfix-conf
+        - name: mail-custom-com-tls
+          secret:
+            secretName: mail-custom-com-tls
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opendkim
+  namespace: custom-mail
+  labels:
+    app: opendkim
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opendkim
+  template:
+    metadata:
+      labels:
+        app: opendkim
+    spec:
+      hostname: opendkim
+      imagePullSecrets:
+      - name: images-custom-com-registry
+      containers:
+        - name: opendkim
+          image: images.custom.com/ticfinack/opendkim:v1.0
+          imagePullPolicy: Always
+          env:
+            - name: MAILDOMAIN
+              value: "custom.com"
+          ports:
+            - containerPort: 8891
+              name: opendkim
+          volumeMounts:
+            - mountPath: "/etc/opendkim"
+              name: opendkim-conf
+      volumes:
+        - name: opendkim-conf
+          persistentVolumeClaim:
+            claimName: opendkim-conf
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: custom-mail
+  labels:
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      hostname: redis
+      containers:
+        - name: redis
+          image: redis:alpine3.18
+          ports:
+            - containerPort: 6379
+              name: redis
+          volumeMounts:
+            - mountPath: "/data"
+              name: redis-data
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: redis-data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextcloud
+  namespace: custom-mail
+  labels:
+    app: nextcloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nextcloud
+  template:
+    metadata:
+      labels:
+        app: nextcloud
+    spec:
+      hostname: nextcloud
+      containers:
+        - name: nextcloud
+          image: nextcloud:27.0.0-apache
+          env:
+            - name: MYSQL_HOST
+              value: "mysql.custom-mail.svc.cluster.local"
+            - name: MYSQL_DATABASE
+              value: "nextcloud"
+            - name: MYSQL_USER
+              value: "root"
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: MARIADB_ROOT_PASSWORD
+            - name: NEXTCLOUD_ADMIN_USER
+              value: "ticfinack"
+            - name: NEXTCLOUD_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: NEXTCLOUD_ADMIN_PASSWORD
+            - name: NEXTCLOUD_DATA_DIR
+              value: "/srv/nextcloud-data"
+            - name: NEXTCLOUD_TRUSTED_DOMAINS
+              value: "drive.custom.com"
+            - name: REDIS_HOST
+              value: "redis.custom-mail.svc.cluster.local"
+            - name: SMTP_HOST
+              value: "mail.custom.com"
+            - name: SMTP_SECURE
+              value: "tls"
+            - name: SMTP_PORT
+              value: "587"
+            - name: SMTP_AUTHTYPE
+              value: "PLAIN"
+            - name: SMTP_NAME
+              value: "drive@custom.com"
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: DRIVE_SMTP_PASSWORD
+            - name: MAIL_FROM_ADDRESS
+              value: "Drive@custom.com"
+            - name: MAIL_DOMAIN
+              value: "custom.com"
+            - name: PHP_UPLOAD_LIMIT
+              value: "50G"
+            - name: APACHE_DISABLE_REWRITE_IP
+              value: "1"
+            - name: TRUSTED_PROXIES
+              value: "10.0.0.0/8"
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - mountPath: "/var/www/html"
+              name: nextcloud-html
+          volumeMounts:
+            - mountPath: "/srv/nextcloud-data"
+              name: nextcloud-data
+            - mountPath: "/var/www/html"
+              name: nextcloud-config
+      volumes:
+        - name: nextcloud-data
+          persistentVolumeClaim:
+            claimName: nextcloud-data
+        - name: nextcloud-config
+          persistentVolumeClaim:
+            claimName: nextcloud-config
