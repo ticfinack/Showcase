@@ -7,3 +7,5 @@ The file above named "Algorithm for file updates in Python.pdf" was created duri
 The file above named "BuildExe.py" creates an executable of the automateRecon.py file.
 
 The file above named "ReconAutomation.exe" is the executable version of the automateRecon.py file.
+
+The file above named "ConnectwiseManageTicketMonitorPostToTeams.py" is a simple python script that checks for new Connectwise Manage tickets every 5 minutes and posts them in a single message to a chosen MS Teams channel. This is just a basic example of API integrations using python.
